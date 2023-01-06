@@ -1,0 +1,89 @@
+﻿@page "/movie"
+@page "/movie/{id:int}"
+@inject NavigationManager NavigationManager
+@inject IMovieService MovieService
+@attribute [Authorize(Roles = "admin,staff")]
+
+@if (Id == null)
+{
+    <PageTitle>Create a new Movie</PageTitle>
+    <h3>Create a new Movie</h3>
+}
+else
+{
+    <PageTitle>Edit @mv.Name</PageTitle>
+    <h3>Edit @mv.Name</h3>
+}
+
+<button class="btn btn-primary" @onclick="BackToMovies">Back</button>
+
+<EditForm Model="@mv" OnSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="moviename">Movie Name</label>
+        <InputText id="moviename" @bind-Value="mv.Name" class="form-control"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="cost">Cost</label>
+        <InputNumber  id="cost" @bind-Value="mv.Cost" class="form-control"></InputNumber>
+    </div>
+    
+    <br />
+    <button type="submit" class="btn btn-primary">@btnText</button>
+</EditForm>
+
+
+
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+    string btnText = string.Empty;
+    Movie mv = new Movie();
+    public bool isHide;
+    private EditContext editContext = default!;
+    private ValidationMessageStore messageStore;    
+
+    protected override async Task OnInitializedAsync()
+    {         
+        btnText = Id == null ? "Save New Movie" : "Update Movie";
+        isHide = (Id == null);        
+    }
+
+    void BackToMovies()
+    {
+        NavigationManager.NavigateTo("/movies");
+    }
+
+    private void OnValidationRequested(object sender, ValidationRequestedEventArgs e)
+    {
+        messageStore.Clear();
+        if (string.IsNullOrEmpty(mv.Name))
+        {
+            messageStore.Add(() => mv.Name, "Value is required");
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if(Id != null)//edit
+        {
+            mv =  await MovieService.GetMovie((int)Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if(Id == null)
+        {
+            await MovieService.CreateMovie(mv);
+        }
+        else
+        {
+            await MovieService.UpdateMovie(mv);
+        }
+        
+    }
+    
+}

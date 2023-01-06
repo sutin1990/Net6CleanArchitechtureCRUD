@@ -1,0 +1,56 @@
+﻿@page "/movies"
+@inject IMovieService MovieService
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin,staff")]
+<h3>Movies</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Movie Name</th>
+            <th>Cost</th>            
+            <th>Manage</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (MovieService.Movies.Count > 0)
+        {
+            foreach (var movie in MovieService.Movies)
+            {
+                <tr>
+                    <td>@movie.Name</td>
+                    <td>@movie.Cost</td>
+                    
+                    <td>
+                       <button class="btn btn-primary" @onclick="(()=> ShowMovie(movie.Id))"><i class="oi oi-pencil"></i></button>&nbsp;
+                       <button class="btn btn-danger" @onclick="(()=> DeleteMovie(movie.Id))"><i class="oi oi-trash"></i></button>
+                    </td>
+                </tr>
+            }
+        }
+
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="CreateNewMovie">Create New</button>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await MovieService.GetAllMovies();
+    }
+
+    void ShowMovie(int id)
+    {
+        NavigationManager.NavigateTo($"movie/{id}");
+    }
+
+    void CreateNewMovie()
+    {
+        NavigationManager.NavigateTo("/movie");
+    }
+
+    async Task DeleteMovie(int id)
+    {
+        await MovieService.DeleteMovie(id);
+    }
+}

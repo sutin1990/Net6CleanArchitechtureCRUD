@@ -1,0 +1,34 @@
+﻿@page "/login"
+@inject IAuthService AuthService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+<h3>Login</h3>
+
+<EditForm Model="user" OnSubmit="HandleLogin">
+    <label for="username">Name</label>
+    <InputText id="username" @bind-Value="user.UserName"></InputText>
+    <label for="password">Password</label>
+    <InputText id="password" @bind-Value="user.Password" type="password"></InputText>
+    <button type="submit" class="btn btn-primary">Do it!</button>
+</EditForm>
+@code {
+    public UserLoginDto user = new UserLoginDto();
+
+    async Task HandleLogin()
+    {
+        var result = await Http.PostAsJsonAsync("api/auth/login", user);
+        var data = await result.Content.ReadFromJsonAsync<UserLoginDtoResponse>();
+        //var data = await AuthService.LoginDto(user);
+        //var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        Console.WriteLine(data.Token);
+        await LocalStorage.SetItemAsync("token", data.Token);
+        var stage = await AuthStateProvider.GetAuthenticationStateAsync();
+        //var currentUser = ((ClaimsIdentity)stage.User.Identity).FindFirst("username").Value;
+
+        //Console.WriteLine($"Identity = {currentUser}");
+        NavigationManager.NavigateTo("movies");
+    }
+
+}

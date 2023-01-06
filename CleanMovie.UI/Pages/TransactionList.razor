@@ -1,0 +1,95 @@
+﻿@page "/moviesrentaltrans"
+
+@inject IMoviesRentalTransactionService MoviesRentalTransactionService
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin,staff")]
+
+<h3>MoviesRentalTransaction</h3>
+<EditForm Model="@criteriaData" OnSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label for="usernamecustomer">UserName Customer</label>
+        <InputText id="usernamecustomer" @bind-Value="criteriaData.UserNameCustomer" class="form-control"></InputText>
+    </div>
+    <div class="form-group">
+        <label for="usernamestaffrent">UserName Staff Rent </label>
+        <InputText id="usernamestaffrent" @bind-Value="criteriaData.UserNameStaffRent" class="form-control"></InputText>
+    </div>
+
+    <div class="form-group row">
+        <label for="rentdate" class="col-sm-2 col-form-label">Rent Date</label>
+        <div class="col-sm-10">
+            <InputDate id="rentdate" @bind-Value="criteriaData.RentDate" class="form-control"></InputDate>
+        </div>
+
+    </div>
+
+    <br />
+    <button type="submit" class="btn btn-primary">Search</button>
+</EditForm>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Movie Name</th>
+            <th>Cost</th>
+            <th>Rental date</th>
+            <th>Return date</th>
+            <th>Late Fines</th>
+            <th>Customer Name</th>
+            <th>Staff Rental Name</th>
+            <th>Manage</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (MoviesRentalTransactionService.MoviesRentalTransaction.Count > 0)
+        {
+            foreach (var trans in MoviesRentalTransactionService.MoviesRentalTransaction)
+            {
+                <tr>
+                    <td>@trans?.Movie?.Name</td>
+                    <td>@trans?.Movie?.Cost</td>
+                    <td>@trans?.RentDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                    <td>@trans?.ReturnDate.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                    <td>@trans?.LateFines</td>
+                    <td>@trans?.UserLoginDtoCustomer?.FirstName</td>
+                    <td>@trans?.UserLoginDtoStaffRent?.FirstName</td>
+
+                    <td>
+                        <button class="btn btn-primary" @onclick="(()=> ShowMovieTrans(trans.Id))"><i class="oi oi-pencil"></i></button>&nbsp;
+                        <button class="btn btn-danger" @onclick="(()=>DeleteTransaction(trans.Id))"><i class="oi oi-trash"></i></button>
+                    </td>
+                </tr>
+            }
+        }
+
+    </tbody>
+</table>
+
+<button class="btn btn-primary" @onclick="CreateNewTransaction">Create New</button>
+@code {
+    RequestDataConditionTransaction criteriaData = new RequestDataConditionTransaction();
+
+    async Task HandleSubmit()
+    {
+        await MoviesRentalTransactionService.GetMoviesRentalTransactionByCriteria(criteriaData);
+
+    }
+
+    void ShowMovieTrans(int id)
+    {
+        NavigationManager.NavigateTo($"/migratetransactions/{id}");
+    }
+
+    async Task CreateNewTransaction()
+    {
+        NavigationManager.NavigateTo("/migratetransactions");
+    }
+
+    async Task DeleteTransaction(int id)
+    {
+        await MoviesRentalTransactionService.DeleteTransaction(id);
+    }
+
+}
