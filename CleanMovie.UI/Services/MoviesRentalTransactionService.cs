@@ -17,7 +17,7 @@ namespace CleanMovie.UI.Services
         public async Task GetMoviesRentalTransactionByCriteria(RequestDataConditionTransaction request)
         {
             var result = await _http.PostAsJsonAsync("api/MovieRentalTransaction/GetMoviesRentalTransactionByCriteria", request);
-            _ = this.SetMoviesRentalTransaction(result);
+            _ = this.SetMoviesRentalTransactionList(result);
         }
 
         public async Task<MoviesRentalTransaction> GetMoviesRentalTransactionById(int id)
@@ -31,7 +31,7 @@ namespace CleanMovie.UI.Services
             throw new Exception("No data.");
         }
 
-        private async Task SetMoviesRentalTransaction(HttpResponseMessage result)
+        private async Task SetMoviesRentalTransactionList(HttpResponseMessage result)
         {
             var response = await result.Content.ReadFromJsonAsync<ResponseData<List<MoviesRentalTransaction>>>();
             var rawList = response?.Data;
@@ -39,16 +39,27 @@ namespace CleanMovie.UI.Services
             //_navigationManager.NavigateTo("movies");
         }
 
+
         public async Task CreateTransaction(MoviesRentalTransaction moviesRentalTransaction)
         {
             var result = await _http.PostAsJsonAsync("api/MovieRentalTransaction/Create", moviesRentalTransaction);
+            if(result != null)
+            {
+                RequestDataConditionTransaction req = new();
+                await this.GetMoviesRentalTransactionByCriteria(req);
+            }
             _navigationManager.NavigateTo("moviesrentaltrans");
             //await SetMovie(result);
         }
 
         public async Task UpdateTransaction(MoviesRentalTransaction moviesRentalTransaction)
-        {
+        {            
             var result = await _http.PutAsJsonAsync("api/MovieRentalTransaction/Update", moviesRentalTransaction);
+            if (result != null)
+            {
+                RequestDataConditionTransaction req = new();
+                await this.GetMoviesRentalTransactionByCriteria(req);
+            }
             _navigationManager.NavigateTo("moviesrentaltrans");
             //await SetMovie(result);
         }
@@ -56,6 +67,10 @@ namespace CleanMovie.UI.Services
         public async Task DeleteTransaction(int id)
         {
             var result = await _http.DeleteAsync($"api/MovieRentalTransaction/Delete/{id}");
+            if(result != null)
+            {
+                MoviesRentalTransaction.RemoveAll(s=>s.Id == id);
+            }
             _navigationManager.NavigateTo("moviesrentaltrans");            
         }
     }

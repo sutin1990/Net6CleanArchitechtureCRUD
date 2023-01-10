@@ -17,8 +17,9 @@ namespace CleanMovie.Domain.DBModels.MappingProfile
 
         static MoviesRentalTransactionProfile()
         {
+
             var config = new MapperConfiguration(c => {
-                c.CreateMap<MoviesRentalTransaction, MoviesRentalTransaction>().ForMember(dest => dest.Id,opt => opt.MapFrom(src => $"{src.Id}"));
+                c.CreateMap<MoviesRentalTransaction, MoviesRentalTransaction>();//.ForMember(dest => dest.Id,opt => opt.MapFrom(src => $"{src.Id}"));
             });
 
             Mapper = config.CreateMapper();

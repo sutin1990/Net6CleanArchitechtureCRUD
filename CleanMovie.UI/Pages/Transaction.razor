@@ -132,6 +132,7 @@ else
 
         if (Id != null)
         {
+            //mt.StaffRentId = Convert.ToInt32(((ClaimsIdentity)user?.Identity)?.FindFirst("userid")?.Value?.ToString());
             mt.StaffReturnId = Convert.ToInt32(((ClaimsIdentity)user?.Identity)?.FindFirst("userid")?.Value?.ToString());
         }
         else

@@ -65,22 +65,30 @@ namespace CleanMovie.Infrastructure
 
         public async Task<MoviesRentalTransaction> UpdateMoviesRentalTransaction(MoviesRentalTransaction moviesRentalTransaction)
         {
-            var dbTransaction = _context.MoviesRentalTransactions.FirstOrDefault(x => x.Id == moviesRentalTransaction.Id);
-            if (dbTransaction != null)
+            //var dbTransaction = await _context.MoviesRentalTransactions.FirstOrDefaultAsync(f=>f.Id == moviesRentalTransaction.Id);
+            if (!(await _context.MoviesRentalTransactions.AnyAsync(x => x.Id == moviesRentalTransaction.Id)))
             {
-                //var dataMapped = MoviesRentalTransactionProfile.Mapper.Map<MoviesRentalTransaction>(moviesRentalTransaction);
-                dbTransaction.RentDate = moviesRentalTransaction.RentDate;
-                dbTransaction.ExpiryDate = moviesRentalTransaction.ExpiryDate;
-                dbTransaction.ReturnDate = moviesRentalTransaction.ReturnDate;
-                dbTransaction.LateFines = moviesRentalTransaction.LateFines;
-                dbTransaction.MovieId = moviesRentalTransaction.MovieId;
-                //dbTransaction.StaffRentId = moviesRentalTransaction.StaffRentId;
-                dbTransaction.StaffReturnId = moviesRentalTransaction.StaffReturnId;
-                dbTransaction.CutomerId = moviesRentalTransaction.CutomerId;
-                //_context.Update(moviesRentalTransaction);
-                await _context.SaveChangesAsync();
+                throw new Exception("MoviesRentalTransactions not found");               
             }
-            return dbTransaction;
+            var dataMapped = MoviesRentalTransactionProfile.Mapper.Map<MoviesRentalTransaction>(moviesRentalTransaction);
+            dataMapped.Movie = null;
+            //var config = new MapperConfiguration(c => {
+            //    c.CreateMap<MoviesRentalTransaction, MoviesRentalTransaction>();//.ForMember(dest => dest.Id,opt => opt.MapFrom(src => $"{src.Id}"));
+            //});
+
+            //var dataMapped = new Mapper(config);
+            //var dbTransaction = dataMapped.Map<MoviesRentalTransaction>(moviesRentalTransaction);
+
+            //dbTransaction.RentDate = moviesRentalTransaction.RentDate;
+            //dbTransaction.ExpiryDate = moviesRentalTransaction.ExpiryDate;
+            //dbTransaction.ReturnDate = moviesRentalTransaction.ReturnDate;
+            //dbTransaction.LateFines = moviesRentalTransaction.LateFines;
+            //dbTransaction.MovieId = moviesRentalTransaction.MovieId;
+            //dbTransaction.StaffReturnId = moviesRentalTransaction.StaffReturnId;
+            //dbTransaction.CutomerId = moviesRentalTransaction.CutomerId;
+            _context.Update(dataMapped);
+            await _context.SaveChangesAsync();
+            return moviesRentalTransaction;
         }
         public async Task<MoviesRentalTransaction> DeleteMoviesRentalTransaction(int id)
         {
@@ -118,6 +126,8 @@ namespace CleanMovie.Infrastructure
                                     Movie = m ?? new Movie(),
                                     CutomerId = t.CutomerId,
                                     MovieId = t.MovieId,
+                                    StaffRentId = t.StaffRentId,
+                                    StaffReturnId = t.StaffReturnId
 
                                 }).FirstOrDefaultAsync();
             return result;
