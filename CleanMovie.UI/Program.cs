@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Components.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CleanMovie.UI.Provider;
+using Radzen;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,8 +44,14 @@ builder.Services.AddAuthenticationCore();
 
 builder.Services.AddBlazoredLocalStorage();
 
+builder.Services.AddScoped<DialogService>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<TooltipService>();
+builder.Services.AddScoped<ContextMenuService>();
 
 var app = builder.Build();
+
+//Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -2,9 +2,9 @@
 @inject IMovieService MovieService
 @inject NavigationManager NavigationManager
 @attribute [Authorize(Roles = "admin,staff")]
-<h3>Movies</h3>
 
-<table class="table">
+
+@*<table class="table">
     <thead>
         <tr>
             <th>Movie Name</th>
@@ -31,9 +31,55 @@
 
     </tbody>
 </table>
-<button class="btn btn-primary" @onclick="CreateNewMovie">Create New</button>
+<button class="btn btn-primary" @onclick="CreateNewMovie">Create New</button>*@
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+    Movies List
+</RadzenText>
+@*<RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+    Display tabular data with ease. Perform paging, sorting and filtering through Entity Framework without extra code.
+</RadzenText>*@
+
+<RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Add New Movie" Click="@InsertRow"  />
+
+ <RadzenDataGrid @ref="movieGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" AllowColumnPicking="true" AllowGrouping="true" 
+    AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+    Data="@MovieService.Movies" TItem="Movie" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or"  GridLines="@GridLines"
+    EditMode="DataGridEditMode.Single"
+    RowCreate="@OnCreateRow"
+ >
+
+        <Columns>
+            <RadzenDataGridColumn TItem="Movie" Property="Id" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center"/>
+            <RadzenDataGridColumn TItem="Movie" Property="Name" Filterable="false" Title="Name"  Width="180px" TextAlign="TextAlign.Center">
+                <EditTemplate Context="movie">
+                    <RadzenTextBox   @bind-Value="movie.Name" Name="Name" Style="width:100%; display: block;" />
+                    <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Movie" Property="Cost" Filterable="false" Title="Cost"  Width="100px" TextAlign="TextAlign.Center">
+                <EditTemplate Context="movie">
+                    <InputNumber  @bind-Value="movie.Cost" Name="Cost"  Style="width:100%; display: block;" />
+                    @*<RadzenRequiredValidator Text="Cost is required" Component="Cost" Popup="true" />*@
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Movie" Context="movie" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="156px">
+                <EditTemplate Context="movie">
+                    @*<RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(order))">
+                    </RadzenButton>*@
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@((args) => CancelEdit(movie))">
+                    </RadzenButton>
+                    @*<RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => DeleteRow(order))">
+                    </RadzenButton>*@
+                </EditTemplate>
+            </RadzenDataGridColumn>
+        </Columns>
+</RadzenDataGrid>
 
 @code {
+    RadzenDataGrid<Movie> movieGrid;
+     DataGridGridLines GridLines = DataGridGridLines.Default;
     protected override async Task OnInitializedAsync()
     {
         await MovieService.GetAllMovies();
@@ -52,5 +98,32 @@
     async Task DeleteMovie(int id)
     {
         await MovieService.DeleteMovie(id);
+    }
+
+    Movie movieToInsert;
+
+    async Task InsertRow()
+    {
+        movieToInsert = new Movie();
+        await movieGrid.InsertRow(movieToInsert);
+    }
+
+     void CancelEdit(Movie movie)
+    {
+        if (movie == movieToInsert)
+        {
+            movieToInsert = null;
+        }
+
+        movieGrid.CancelEditRow(movie);
+        
+    }
+
+    async Task OnCreateRow(Movie movie)
+    {
+        
+        await MovieService.CreateMovie(movie);
+        // For production
+        //dbContext.SaveChanges();
     }
 }
