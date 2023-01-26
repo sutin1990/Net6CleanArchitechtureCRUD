@@ -2,13 +2,13 @@
 @inject IMovieService MovieService
 @inject NavigationManager NavigationManager
 @attribute [Authorize(Roles = "admin,staff")]
-
+@inject DialogService dialogService
 
 @*<table class="table">
     <thead>
         <tr>
             <th>Movie Name</th>
-            <th>Cost</th>            
+            <th>Cost</th>
             <th>Manage</th>
         </tr>
     </thead>
@@ -20,7 +20,7 @@
                 <tr>
                     <td>@movie.Name</td>
                     <td>@movie.Cost</td>
-                    
+
                     <td>
                        <button class="btn btn-primary" @onclick="(()=> ShowMovie(movie.Id))"><i class="oi oi-pencil"></i></button>&nbsp;
                        <button class="btn btn-danger" @onclick="(()=> DeleteMovie(movie.Id))"><i class="oi oi-trash"></i></button>
@@ -40,49 +40,76 @@
     Display tabular data with ease. Perform paging, sorting and filtering through Entity Framework without extra code.
 </RadzenText>*@
 
-<RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Add New Movie" Click="@InsertRow"  />
+<RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Add New Movie" Click="@InsertRow" Disabled=@(movieToInsert != null || movieToUpdate != null) />
 
- <RadzenDataGrid @ref="movieGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" AllowColumnPicking="true" AllowGrouping="true" 
-    AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
-    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-    Data="@MovieService.Movies" TItem="Movie" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or"  GridLines="@GridLines"
-    EditMode="DataGridEditMode.Single"
-    RowCreate="@OnCreateRow"
- >
+<RadzenDataGrid @ref="movieGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="true" AllowColumnPicking="true" AllowGrouping="true"
+                AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                SelectionMode="DataGridSelectionMode.Single"
 
-        <Columns>
-            <RadzenDataGridColumn TItem="Movie" Property="Id" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center"/>
-            <RadzenDataGridColumn TItem="Movie" Property="Name" Filterable="false" Title="Name"  Width="180px" TextAlign="TextAlign.Center">
-                <EditTemplate Context="movie">
-                    <RadzenTextBox   @bind-Value="movie.Name" Name="Name" Style="width:100%; display: block;" />
-                    <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
-                </EditTemplate>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Movie" Property="Cost" Filterable="false" Title="Cost"  Width="100px" TextAlign="TextAlign.Center">
-                <EditTemplate Context="movie">
-                    <InputNumber  @bind-Value="movie.Cost" Name="Cost"  Style="width:100%; display: block;" />
-                    @*<RadzenRequiredValidator Text="Cost is required" Component="Cost" Popup="true" />*@
-                </EditTemplate>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Movie" Context="movie" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="156px">
-                <EditTemplate Context="movie">
-                    @*<RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(order))">
-                    </RadzenButton>*@
-                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@((args) => CancelEdit(movie))">
-                    </RadzenButton>
-                    @*<RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => DeleteRow(order))">
-                    </RadzenButton>*@
-                </EditTemplate>
-            </RadzenDataGridColumn>
-        </Columns>
+                Data="@MovieService.Movies" TItem="Movie" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" GridLines="@GridLines"
+                EditMode="DataGridEditMode.Single"
+                RowCreate="@OnCreateRow" RowUpdate="@OnUpdateRow">
+
+    <Columns>
+        <RadzenDataGridColumn TItem="Movie" Property="Id" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="Movie" Property="Name" Filterable="false" Title="Name" Width="180px" TextAlign="TextAlign.Center">
+            <EditTemplate Context="movie">
+                <RadzenTextBox @bind-Value="movie.Name" Name="Name" Style="width:100%; display: block;" />
+                <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Movie" Property="Cost" Filterable="false" Title="Cost" Width="100px" TextAlign="TextAlign.Center">
+            <EditTemplate Context="movie">
+                <RadzenNumeric @bind-Value="movie.Cost" Name="Cost" Style="width:100%; display: block;" />
+                @*<InputNumber  @bind-Value="movie.Cost" Name="Cost"  Style="width:100%; display: block;" />*@
+                <RadzenRequiredValidator Text="Cost is required" Component="Cost" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="Movie" Context="movie" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="156px">
+            <Template Context="movie">
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(movie))" @onclick:stopPropagation="true">
+                </RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => ShowInlineDialog(movie))" @onclick:stopPropagation="true">
+                </RadzenButton>
+            </Template>
+            <EditTemplate Context="movie">
+                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(movie))">
+                </RadzenButton>
+                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@((args) => CancelEdit(movie))">
+                </RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => DeleteRow(movie))">
+                </RadzenButton>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+    </Columns>
 </RadzenDataGrid>
 
 @code {
-    RadzenDataGrid<Movie> movieGrid;
-     DataGridGridLines GridLines = DataGridGridLines.Default;
+    RadzenDataGrid<Movie>? movieGrid;
+    Movie? movieToInsert;
+    Movie? movieToUpdate;
+    DataGridGridLines GridLines = DataGridGridLines.Default;
     protected override async Task OnInitializedAsync()
     {
         await MovieService.GetAllMovies();
+    }
+
+    public void Dispose()
+    {
+        // The DialogService is a singleton so it is advisable to unsubscribe.
+        dialogService.OnOpen -= Open;
+        dialogService.OnClose -= Close;
+    }
+
+    void Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+    {
+        //console.Log("Dialog opened");
+    }
+
+    void Close(dynamic result)
+    {
+        //console.Log($"Dialog closed");
     }
 
     void ShowMovie(int id)
@@ -100,30 +127,101 @@
         await MovieService.DeleteMovie(id);
     }
 
-    Movie movieToInsert;
-
     async Task InsertRow()
     {
         movieToInsert = new Movie();
-        await movieGrid.InsertRow(movieToInsert);
+        await movieGrid?.InsertRow(movieToInsert);
     }
 
-     void CancelEdit(Movie movie)
+    async Task EditRow(Movie movie)
+    {
+        movieToUpdate = movie;
+        await movieGrid?.EditRow(movie);
+    }
+
+    async Task DeleteRow(Movie movie)
     {
         if (movie == movieToInsert)
         {
             movieToInsert = null;
         }
 
-        movieGrid.CancelEditRow(movie);
-        
+        if (movie == movieToUpdate)
+        {
+            movieToUpdate = null;
+        }
+
+        if (MovieService.Movies.Contains(movie))
+        {
+
+            await MovieService.DeleteMovie(movie.Id);
+
+
+            await movieGrid.Reload();
+        }
+        else
+        {
+            movieGrid.CancelEditRow(movie);
+            await movieGrid.Reload();
+        }
+    }
+
+    void CancelEdit(Movie movie)
+    {
+        if (movie == movieToInsert)
+        {
+            movieToInsert = null;
+        }
+
+        movieGrid?.CancelEditRow(movie);
+
     }
 
     async Task OnCreateRow(Movie movie)
     {
-        
         await MovieService.CreateMovie(movie);
-        // For production
-        //dbContext.SaveChanges();
     }
+
+    async Task OnUpdateRow(Movie movie)
+    {
+        if (movie == movieToInsert)
+        {
+            movieToInsert = null;
+        }
+        movieToUpdate = null;
+
+        // For demo purposes only
+        await MovieService.UpdateMovie(movie);
+    }
+
+    async Task SaveRow(Movie movie)
+    {
+        await movieGrid.UpdateRow(movie);
+    }
+
+    async Task ShowInlineDialog(Movie movie)
+    {
+        var res = await MovieService.OpenConfirm(movie);
+        if (res.IsDeleted)
+        {
+            //await DeleteRow(res);
+        }        
+
+
+    //    var result = await dialogService.OpenAsync("Confirm to delete.", ds =>
+    //@<div>
+    //    <p Style="margin-bottom: 1rem">Confirm?</p>
+    //    <div class="row">
+    //        <div class="col-md-12">
+    //            <RadzenButton Text="Ok" Click="() => DeleteRow(movie)" Style="margin-bottom: 10px; width: 150px" />
+    //            <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" Style="margin-bottom: 10px; width: 150px" />
+               
+    //        </div>
+    //    </div>
+    //</div>);
+
+    
+    //    Console.WriteLine($"Dialog result: {result}");
+    }
+
 }

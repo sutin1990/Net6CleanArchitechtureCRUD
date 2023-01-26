@@ -69,6 +69,7 @@
 
 <button class="btn btn-primary" @onclick="CreateNewTransaction">Create New</button>
 @code {
+    [Parameter] public int OrderID { get; set; }
     RequestDataConditionTransaction criteriaData = new RequestDataConditionTransaction();
 
     async Task HandleSubmit()

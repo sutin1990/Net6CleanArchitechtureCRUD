@@ -1,17 +1,21 @@
 ﻿using CleanMovie.Domain.DBModels;
 using CleanMovie.Domain.ReponseModels;
+using CleanMovie.UI.Pages;
+using CleanMovie.UI.Pages.Component;
 using Microsoft.AspNetCore.Components;
-
+using Radzen;
 namespace CleanMovie.UI.Services
 {
     public class MovieService : IMovieService
     {
         private readonly HttpClient _http;
         private readonly NavigationManager _navigationManager;
-        public MovieService(HttpClient http, NavigationManager navigationManager)
+        private readonly DialogService _dialogService;
+        public MovieService(HttpClient http, NavigationManager navigationManager, DialogService dialogService)
         {
             _http = http;
             _navigationManager = navigationManager;
+            this._dialogService = dialogService;
         }
 
         public List<Movie> Movies { get; set; } = new List<Movie>();
@@ -39,22 +43,24 @@ namespace CleanMovie.UI.Services
 
         public async Task CreateMovie(Movie movie)
         {
-            var result = await _http.PostAsJsonAsync("api/Movies/CreateMovie", movie);
-            _navigationManager.NavigateTo("movies");
+            await _http.PostAsJsonAsync("api/Movies/CreateMovie", movie);
+            await GetAllMovies();
+            //_navigationManager.NavigateTo("movies");
             //await SetMovie(result);
         }
 
         public async Task UpdateMovie(Movie movie)
         {
             _ = await _http.PutAsJsonAsync("api/Movies/UpdateMovie", movie);
-            _navigationManager.NavigateTo("movies");
+            await GetAllMovies();
+            //_navigationManager.NavigateTo("movies");
             //await SetMovie(result);
         }
 
         public async Task DeleteMovie(int id)
         {
             var result = await _http.DeleteAsync($"api/Movies/DeleteMovie/{id}");
-            _ = SetMovie(result);
+            await GetAllMovies();
             //_navigationManager.NavigateTo("movies");
             //await SetMovie(result);
         }
@@ -64,6 +70,16 @@ namespace CleanMovie.UI.Services
             var response = await result.Content.ReadFromJsonAsync<List<Movie>>();
             Movies = response ?? Movies;
             _navigationManager.NavigateTo("movies");
+        }
+
+        public async Task<Movie> OpenConfirm(Movie movie)
+        {
+           var result = await _dialogService.OpenAsync<ConfirmDialog>("Confirm Delete");
+            if(result != null)
+            {
+                movie.IsDeleted = result;
+            }            
+            return movie;
         }
     }
 }
