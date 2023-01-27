@@ -5,13 +5,15 @@ global using CleanMovie.Domain.DBModels;
 global using Blazored.LocalStorage;
 global using Microsoft.JSInterop;
 global using CleanMovie.Domain.ReponseModels;
+global using CleanMovie.Domain.PartialModels;
+global using CleanMovie.UI.Pages.Component;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CleanMovie.UI.Provider;
 using Radzen;
-
+using System.Diagnostics.Tracing;
 
 var builder = WebApplication.CreateBuilder(args);
 

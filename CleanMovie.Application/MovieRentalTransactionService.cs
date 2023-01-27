@@ -1,4 +1,5 @@
 ﻿using CleanMovie.Domain.DBModels;
+using CleanMovie.Domain.PartialModels;
 using CleanMovie.Domain.ReponseModels;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace CleanMovie.Application
             return await _repository.GetAllMoviesRentalTransaction();
         }
 
-        public async Task<ResponseData<List<MoviesRentalTransaction>>> GetMoviesRentalTransactionByCriteria(RequestDataConditionTransaction request)
+        public async Task<ResponseData<List<MoviesRentalTransaction>>> GetMoviesRentalTransactionByCriteria(CriteriaTransaction request)
         {
             ResponseData<List<MoviesRentalTransaction>> response = new()
             {

@@ -1,5 +1,5 @@
 ﻿using CleanMovie.Domain.DBModels;
-using CleanMovie.Domain.ReponseModels;
+using CleanMovie.Domain.PartialModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace CleanMovie.Application
     {
         public Task<List<MoviesRentalTransaction>> GetAllMoviesRentalTransaction();
         public Task<MoviesRentalTransaction> GetMoviesRentalTransactionById(int id);
-        public Task<List<MoviesRentalTransaction>> GetMoviesRentalTransactionByCriteria(RequestDataConditionTransaction request);
+        public Task<List<MoviesRentalTransaction>> GetMoviesRentalTransactionByCriteria(CriteriaTransaction request);
         public Task<MoviesRentalTransaction> CreateMoviesRentalTransaction(MoviesRentalTransaction moviesRentalTransaction);
         Task<MoviesRentalTransaction> UpdateMoviesRentalTransaction(MoviesRentalTransaction moviesRentalTransaction);
         Task<MoviesRentalTransaction> DeleteMoviesRentalTransaction(int id);

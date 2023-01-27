@@ -1,5 +1,7 @@
-﻿using CleanMovie.Domain.ReponseModels;
+﻿using CleanMovie.Domain.PartialModels;
+using CleanMovie.UI.Pages.Component;
 using Microsoft.AspNetCore.Components;
+using Radzen;
 
 namespace CleanMovie.UI.Services
 {
@@ -7,14 +9,16 @@ namespace CleanMovie.UI.Services
     {
         private readonly HttpClient _http;
         private readonly NavigationManager _navigationManager;
+        private readonly DialogService _dialogService;
 
-        public List<MoviesRentalTransaction> MoviesRentalTransaction { get; set; } = new List<MoviesRentalTransaction>();
-        public MoviesRentalTransactionService(HttpClient http, NavigationManager navigationManager)
+        public List<DataGridTransactions> MoviesRentalTransaction { get; set; } = new List<DataGridTransactions>();
+        public MoviesRentalTransactionService(HttpClient http, NavigationManager navigationManager, DialogService dialogService)
         {
             _http = http;
             _navigationManager = navigationManager;
+            _dialogService = dialogService;
         }
-        public async Task GetMoviesRentalTransactionByCriteria(RequestDataConditionTransaction request)
+        public async Task GetMoviesRentalTransactionByCriteria(CriteriaTransaction request)
         {
             var result = await _http.PostAsJsonAsync("api/MovieRentalTransaction/GetMoviesRentalTransactionByCriteria", request);
             _ = this.SetMoviesRentalTransactionList(result);
@@ -33,7 +37,7 @@ namespace CleanMovie.UI.Services
 
         private async Task SetMoviesRentalTransactionList(HttpResponseMessage result)
         {
-            var response = await result.Content.ReadFromJsonAsync<ResponseData<List<MoviesRentalTransaction>>>();
+            var response = await result.Content.ReadFromJsonAsync<ResponseData<List<DataGridTransactions>>>();
             var rawList = response?.Data;
             MoviesRentalTransaction = rawList ?? MoviesRentalTransaction;
             //_navigationManager.NavigateTo("movies");
@@ -42,14 +46,22 @@ namespace CleanMovie.UI.Services
 
         public async Task CreateTransaction(MoviesRentalTransaction moviesRentalTransaction)
         {
-            var result = await _http.PostAsJsonAsync("api/MovieRentalTransaction/Create", moviesRentalTransaction);
-            if(result != null)
+            try
             {
-                RequestDataConditionTransaction req = new();
-                await this.GetMoviesRentalTransactionByCriteria(req);
+                var result = await _http.PostAsJsonAsync("api/MovieRentalTransaction/Create", moviesRentalTransaction);
+                if (result != null)
+                {
+                    CriteriaTransaction req = new();
+                    await this.GetMoviesRentalTransactionByCriteria(req);
+                }
+                //_navigationManager.NavigateTo("moviesrentaltrans");
+                //await SetMovie(result);
             }
-            _navigationManager.NavigateTo("moviesrentaltrans");
-            //await SetMovie(result);
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+           
         }
 
         public async Task UpdateTransaction(MoviesRentalTransaction moviesRentalTransaction)
@@ -57,7 +69,7 @@ namespace CleanMovie.UI.Services
             var result = await _http.PutAsJsonAsync("api/MovieRentalTransaction/Update", moviesRentalTransaction);
             if (result != null)
             {
-                RequestDataConditionTransaction req = new();
+                CriteriaTransaction req = new();
                 await this.GetMoviesRentalTransactionByCriteria(req);
             }
             _navigationManager.NavigateTo("moviesrentaltrans");
@@ -72,6 +84,31 @@ namespace CleanMovie.UI.Services
                 MoviesRentalTransaction.RemoveAll(s=>s.Id == id);
             }
             _navigationManager.NavigateTo("moviesrentaltrans");            
+        }
+
+        public async Task<MoviesRentalTransaction> OpenEditDialog(DataGridTransactions data)
+        {
+            MoviesRentalTransaction moviesRentalTransaction = null;
+            var result = await _dialogService.OpenAsync<TransactionManageDialog>("Create Transaction",
+                new Dictionary<string, object> { { "Data", data } }
+                ,new DialogOptions(){ Width = "700px", Height = "512px", Resizable = false, Draggable = false });
+            if (result != null)
+            {
+                moviesRentalTransaction = result;
+                //moviesRentalTransaction = new MoviesRentalTransaction
+                //{
+                //    Id = result.Id,
+                //    RentDate = result.RentDate,
+                //    ReturnDate= result.ReturnDate,
+                //    ExpiryDate= result.ExpiryDate,  
+                //    LateFines = result.LateFines,
+                //    MovieId = result.MovieId,
+                //    CutomerId= result.CutomerId,
+                //    StaffRentId= result.StaffRentId,
+                //    StaffReturnId= result.StaffReturnId
+                //};
+            }
+            return moviesRentalTransaction;
         }
     }
 }

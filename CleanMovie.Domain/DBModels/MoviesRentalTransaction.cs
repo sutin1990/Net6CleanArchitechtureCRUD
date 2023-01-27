@@ -11,7 +11,7 @@ namespace CleanMovie.Domain.DBModels
     public class MoviesRentalTransaction
     {
         [Key]
-        public int Id  { get; set; }
+        public int Id { get; set; }
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{dd/MM/yyyy}")]
         public DateTime RentDate { get; set; }
@@ -21,12 +21,12 @@ namespace CleanMovie.Domain.DBModels
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{dd/MM/yyyy}")]
         public DateTime ReturnDate { get; set; }
-        public decimal LateFines { get; set; } = 0;        
+        public decimal LateFines { get; set; } = 0;
         public int MovieId { get; set; }
         public int CutomerId { get; set; }
         public int StaffRentId { get; set; }
         public int StaffReturnId { get; set; }
-        
+
         public virtual UserLoginDto? UserLoginDto { get; set; }
         public virtual Movie? Movie { get; set; }
 

@@ -1,5 +1,6 @@
 ﻿using CleanMovie.Application.Qureies;
 using CleanMovie.Domain.DBModels;
+using CleanMovie.Domain.PartialModels;
 using CleanMovie.Domain.ReponseModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +23,7 @@ namespace CleanMovie.API.Controllers
 
         [Route("GetMoviesRentalTransactionByCriteria")]
         [HttpPost]
-        public async Task<ResponseData<List<MoviesRentalTransaction>>> GetMoviesRentalTransactionByCriteria(RequestDataConditionTransaction request)
+        public async Task<ResponseData<List<MoviesRentalTransaction>>> GetMoviesRentalTransactionByCriteria(CriteriaTransaction request)
         {
             return await _mediator.Send(new GetMoviesRentalTransactionByCriteriaQuery(request));
         }

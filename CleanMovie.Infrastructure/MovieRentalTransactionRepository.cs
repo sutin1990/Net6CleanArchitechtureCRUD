@@ -2,7 +2,7 @@
 using CleanMovie.Application;
 using CleanMovie.Domain.DBModels;
 using CleanMovie.Domain.DBModels.MappingProfile;
-using CleanMovie.Domain.ReponseModels;
+using CleanMovie.Domain.PartialModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanMovie.Infrastructure
@@ -22,7 +22,7 @@ namespace CleanMovie.Infrastructure
             return await _context.MoviesRentalTransactions.ToListAsync();
         }
 
-        public async Task<List<MoviesRentalTransaction>> GetMoviesRentalTransactionByCriteria(RequestDataConditionTransaction request)
+        public async Task<List<MoviesRentalTransaction>> GetMoviesRentalTransactionByCriteria(CriteriaTransaction request)
         {
             var result = await (from t in _context.MoviesRentalTransactions
                                 join u in _context.UserLoginDtos on t.StaffRentId equals u.Id into ps
@@ -48,6 +48,10 @@ namespace CleanMovie.Infrastructure
                                     UserLoginDtoStaffRent = u,
                                     UserLoginDtoStaffReturn = rt,
                                     UserLoginDtoCustomer = c,
+                                    MovieId= t.MovieId,
+                                    CutomerId= t.CutomerId,
+                                    StaffRentId= t.StaffRentId,
+                                    StaffReturnId= t.StaffReturnId,
                                     Movie = t.Movie
                                 }).ToListAsync();
 
@@ -57,10 +61,17 @@ namespace CleanMovie.Infrastructure
 
         public async Task<MoviesRentalTransaction> CreateMoviesRentalTransaction(MoviesRentalTransaction moviesRentalTransaction)
         {
-
-            _context.MoviesRentalTransactions.Add(moviesRentalTransaction);
-            await _context.SaveChangesAsync();
-            return moviesRentalTransaction;
+            try
+            {
+                _context.MoviesRentalTransactions.Add(moviesRentalTransaction);
+                await _context.SaveChangesAsync();
+                return moviesRentalTransaction;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            
         }
 
         public async Task<MoviesRentalTransaction> UpdateMoviesRentalTransaction(MoviesRentalTransaction moviesRentalTransaction)

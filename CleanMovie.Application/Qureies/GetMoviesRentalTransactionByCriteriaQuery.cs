@@ -1,4 +1,5 @@
 ﻿using CleanMovie.Domain.DBModels;
+using CleanMovie.Domain.PartialModels;
 using CleanMovie.Domain.ReponseModels;
 using MediatR;
 using System;
@@ -9,5 +10,5 @@ using System.Threading.Tasks;
 
 namespace CleanMovie.Application.Qureies
 {
-    public record GetMoviesRentalTransactionByCriteriaQuery(RequestDataConditionTransaction requestDataConditionTransaction) : IRequest<ResponseData<List<MoviesRentalTransaction>>>;
+    public record GetMoviesRentalTransactionByCriteriaQuery(CriteriaTransaction requestDataConditionTransaction) : IRequest<ResponseData<List<MoviesRentalTransaction>>>;
 }

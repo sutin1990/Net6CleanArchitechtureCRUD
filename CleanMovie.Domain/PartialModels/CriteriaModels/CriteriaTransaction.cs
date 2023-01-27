@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanMovie.Domain.ReponseModels
+namespace CleanMovie.Domain.PartialModels
 {
-    public class RequestDataConditionTransaction
+    public class CriteriaTransaction
     {
         public DateTime RentDate { get; set; }
         public DateTime ExpiryDate { get; set; }

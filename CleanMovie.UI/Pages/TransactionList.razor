@@ -1,11 +1,12 @@
 ﻿@page "/moviesrentaltrans"
-
 @inject IMoviesRentalTransactionService MoviesRentalTransactionService
 @inject NavigationManager NavigationManager
 @attribute [Authorize(Roles = "admin,staff")]
+@inject DialogService dialogService
+@inject AuthenticationStateProvider AuthStateProvider
 
 <h3>MoviesRentalTransaction</h3>
-<EditForm Model="@criteriaData" OnSubmit="HandleSubmit">
+@*<EditForm Model="@criteriaData" OnSubmit="HandleSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="form-group">
@@ -27,9 +28,34 @@
 
     <br />
     <button type="submit" class="btn btn-primary">Search</button>
+</EditForm>*@
+<EditForm Model="@criteriaData" OnSubmit="HandleSubmit">
+<RadzenCard Style="width: 100%;">
+<div class="container">
+    <div class="row">
+        <div class="col-sm-3 col-md-6">
+                <RadzenText TextStyle=" TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">UserName Customer</RadzenText>
+                <RadzenTextBox @bind-Value="criteriaData.UserNameCustomer" Name="UserNameCustomer" Style="width:100%; display: block;" />
+        </div>
+        <div class="col-sm-3 col-md-6">
+                <RadzenText TextStyle=" TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">UserName Staff Rent</RadzenText>
+                <RadzenTextBox @bind-Value="criteriaData.UserNameStaffRent" Name="UserNameStaffRent" Style="width:100%; display: block;" />
+        </div>
+    </div>
+        <div class="row">
+            <div class="col-sm-3 col-md-6">
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">RentDate Date</RadzenText>
+                <RadzenDatePicker Style="100%" @bind-Value="criteriaData.RentDate" Name="RentDate" />
+            </div>
+            
+        </div>
+</div>
+
+    <RadzenButton ButtonType="ButtonType.Submit" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Primary" Text="Search"  />
+</RadzenCard>
 </EditForm>
 
-<table class="table">
+@*<table class="table">
     <thead>
         <tr>
             <th>Movie Name</th>
@@ -65,12 +91,62 @@
         }
 
     </tbody>
-</table>
+</table>*@
 
-<button class="btn btn-primary" @onclick="CreateNewTransaction">Create New</button>
+@*<button class="btn btn-primary" @onclick="CreateNewTransaction">Create New</button>*@
+<div class="row">
+    <div class="col"><RadzenButton Text="Create New" Click="@(args=>CreateNewTransaction())" /></div>
+    
+</div>
+
+
+<RadzenDataGrid @ref="transGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="true" AllowColumnPicking="true" AllowGrouping="true"
+                AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                SelectionMode="DataGridSelectionMode.Single"
+                Data="@MoviesRentalTransactionService.MoviesRentalTransaction" TItem="DataGridTransactions" ColumnWidth="100%" LogicalFilterOperator="LogicalFilterOperator.Or" GridLines="@GridLines"
+                EditMode="DataGridEditMode.Single">
+
+    <Columns>
+        <RadzenDataGridColumn TItem="DataGridTransactions" Property="Id" Filterable="false" Title="ID" Frozen="true" Width="100px" TextAlign="TextAlign.Center" />
+
+        <RadzenDataGridColumn TItem="DataGridTransactions" Property="MovieName" Filterable="false" Title="Name" Width="150px" TextAlign="TextAlign.Left">
+            @*<EditTemplate Context="trans">
+                <RadzenTextBox @bind-Value="trans.Movie.Name" Name="Name" Style="width:100%; display: block;" />
+                <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
+            </EditTemplate>*@
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="DataGridTransactions" Property="MovieCost" Filterable="false" Title="Cost" Width="150px" TextAlign="TextAlign.Right">
+           @* <EditTemplate Context="trans">
+                <RadzenNumeric @bind-Value="trans.Movie.Cost" Name="Cost" Style="width:100%; display: block;" />
+                <RadzenRequiredValidator Text="Cost is required" Component="Cost" Popup="true" />
+            </EditTemplate>*@
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="DataGridTransactions" Property="RentDate" Filterable="false" FormatString="{0:d}" Title="Rent Date" Width="150px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="DataGridTransactions" Property="ReturnDate" Filterable="false" FormatString="{0:d}" Title="Return Date" Width="150px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="DataGridTransactions" Property="LateFines" Filterable="false" Title="Late Fines" Width="150px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="DataGridTransactions" Property="CustomerFirstName" Filterable="false" Title="Customer Name" Width="150px" TextAlign="TextAlign.Left" />
+        <RadzenDataGridColumn TItem="DataGridTransactions" Property="StaffRentFirstName" Filterable="false" Title="Staff Rent" Width="150px" TextAlign="TextAlign.Left" />
+        <RadzenDataGridColumn TItem="DataGridTransactions" Property="StaffReturnFirstName" Filterable="false" Title="Staff Return" Width="150px" TextAlign="TextAlign.Left" />
+
+        <RadzenDataGridColumn TItem="DataGridTransactions" Context="trans" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+            <Template Context="trans">
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditTransaction(trans))" @onclick:stopPropagation="true">
+                </RadzenButton>
+               @* <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => ShowInlineDialog(movie))" @onclick:stopPropagation="true">
+                </RadzenButton>*@
+            </Template>
+            
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
 @code {
-    [Parameter] public int OrderID { get; set; }
-    RequestDataConditionTransaction criteriaData = new RequestDataConditionTransaction();
+    //[Parameter] public int OrderID { get; set; }
+    RadzenDataGrid<DataGridTransactions>? transGrid;
+    DataGridGridLines GridLines = DataGridGridLines.Default;
+    CriteriaTransaction criteriaData = new CriteriaTransaction();
 
     async Task HandleSubmit()
     {
@@ -85,12 +161,40 @@
 
     async Task CreateNewTransaction()
     {
-        NavigationManager.NavigateTo("/migratetransactions");
+        //NavigationManager.NavigateTo("/migratetransactions");
+        MoviesRentalTransaction moviesRentalTransaction = null;
+        //MoviesRentalTransaction moviesRentalTransaction = new MoviesRentalTransaction()
+        //    {
+        //        Movie = new Movie(),
+        //        UserLoginDtoCustomer = new UserLoginDto()
+
+        //    };
+        var result = await dialogService.OpenAsync<TransactionManageDialog>("Create Transaction",
+            new Dictionary<string, object> { { "Data", null } }
+            , new DialogOptions() { Width = "700px", Height = "512px", Resizable = false, Draggable = false });
+        if (result != null)
+        {
+            moviesRentalTransaction = result;
+            await MoviesRentalTransactionService.CreateTransaction(moviesRentalTransaction);
+        }
     }
 
     async Task DeleteTransaction(int id)
     {
         await MoviesRentalTransactionService.DeleteTransaction(id);
+    }
+
+    async Task EditTransaction(DataGridTransactions trans)
+    {
+        var res = await MoviesRentalTransactionService.OpenEditDialog(trans);
+        if(res != null)
+        {
+            var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
+            var user = authstate.User;
+            res.StaffReturnId = Convert.ToInt32(((ClaimsIdentity)user?.Identity)?.FindFirst("userid")?.Value?.ToString());
+            await MoviesRentalTransactionService.UpdateTransaction(res);
+        }
+        await MoviesRentalTransactionService.GetMoviesRentalTransactionByCriteria(criteriaData);
     }
 
 }

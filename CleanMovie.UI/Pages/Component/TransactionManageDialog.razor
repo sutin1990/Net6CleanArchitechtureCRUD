@@ -1,0 +1,133 @@
+﻿@inject DialogService dialogService
+@attribute [Authorize(Roles = "admin,staff")]
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+@inject IUsersService UsersService
+@inject IMovieService MovieService
+
+<div class="container-fluid">
+    <div class="row px-3">
+        <RadzenCard Style="width: 100%; overflow: hidden; border: var(--rz-grid-cell-border)" Class="rz-shadow-0">
+            @if (Data == null)
+            {
+                <PageTitle>Create a new transactions</PageTitle>
+                <RadzenText TextStyle="TextStyle.Subtitle1">Create a new transactions</RadzenText>
+            }
+            else
+            {
+                <PageTitle>Edit @mt.Movie.Name</PageTitle>
+                <RadzenText TextStyle="TextStyle.Subtitle1">Edit @mt.Movie.Name</RadzenText>
+            }
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-3 col-md-6">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">Movies List</RadzenText>
+                        <RadzenDropDown AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="mt.MovieId" Data="@MovieService.Movies"
+                                        Change=@(args => ChangeBound(args, "DropDown with bound Value")) Class="w-100"
+                                        TextProperty="Name" ValueProperty="Id" Style="width:100%; display: block;" />
+                    </div>
+                    <div class="col-sm-3 col-md-6">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">Rent Date</RadzenText>
+                        <RadzenDatePicker Style="100%" @bind-Value="mt.RentDate" />
+                    </div>
+                </div>
+                @if (Data != null)
+                {
+                    <div class="row">
+                        <div class="col-sm-9 col-md-6">
+                            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">Return Date</RadzenText>
+                            <RadzenDatePicker Style="100%" @bind-Value="mt.ReturnDate" Name="ReturnDate" />
+                        </div>
+                        <div class="col-sm-9 col-md-6">
+                            <RadzenText TextStyle=" TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">Late Fines</RadzenText>
+                            <RadzenNumeric @bind-Value="mt.LateFines" Name="LateFines" Style="width:100%; display: block;" />
+                        </div>
+                    </div>
+                }
+
+                <div class="row">
+                    <div class="col-sm-9 col-md-6">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">Expiry Date</RadzenText>
+                        <RadzenDatePicker Style="100%" @bind-Value="mt.ExpiryDate" Name="ExpiryDate" />
+                    </div>
+                    <div class="col-sm-3 col-md-6">
+                        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">Customers List</RadzenText>
+                        <RadzenDropDown AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value="mt.CutomerId" Data="@UsersService.Customers"
+                                        Change=@(args => ChangeBound(args, "DropDown with bound Value")) Class="w-100"
+                                        TextProperty="FirstName" ValueProperty="Id" Style="width:100%; display: block;" />
+                    </div>
+                </div>
+            </div>
+
+        </RadzenCard>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <RadzenButton Text="@btnText" Click="() => Close(mt)" Style="margin-bottom: 10px; width: 150px" />
+            <RadzenButton Text="Cancel" Click="() => Close(null)" ButtonStyle="ButtonStyle.Secondary" Style="margin-bottom: 10px; width: 150px" />
+
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public DataGridTransactions? Data { get; set; }
+    string btnText = string.Empty;
+    public bool isHide;
+
+    MoviesRentalTransaction mt = new MoviesRentalTransaction()
+        {
+            Movie = new Movie(),
+            UserLoginDtoCustomer = new UserLoginDto()
+
+        };
+    protected override async Task OnInitializedAsync()
+    {
+        var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        btnText = Data == null ? "Save New" : "Update";
+        isHide = (Data == null);
+
+        await UsersService.GetUsers(null);
+        await MovieService.GetAllMovies();
+
+        if (Data != null)
+        {
+            //mt.StaffRentId = Convert.ToInt32(((ClaimsIdentity)user?.Identity)?.FindFirst("userid")?.Value?.ToString());
+            mt.StaffReturnId = Convert.ToInt32(((ClaimsIdentity)user?.Identity)?.FindFirst("userid")?.Value?.ToString());
+            mt = Data;
+        }
+        else
+        {
+            mt.StaffRentId = Convert.ToInt32(((ClaimsIdentity)user?.Identity)?.FindFirst("userid")?.Value?.ToString());
+        }
+        //editContext = new EditContext(hero);
+        //messageStore = new ValidationMessageStore(editContext);
+        //editContext.OnValidationRequested += OnValidationRequested;
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Data == null)//create
+        {
+            mt.UserLoginDtoCustomer = UsersService.Customers[0];
+            mt.CutomerId = UsersService.Customers[0].Id;
+
+            mt.Movie = null;
+            mt.MovieId = MovieService.Movies[0].Id;
+        }
+    }
+
+    void ChangeBound(object value, string name)
+    {
+        Console.WriteLine($"{name} value changed to {mt.MovieId}");
+    }
+
+    void Close(MoviesRentalTransaction? res)
+    {
+        //SetIsDelete.IsDelete = res;
+        dialogService.Close(res);
+    }
+}
