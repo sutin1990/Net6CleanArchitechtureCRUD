@@ -30,29 +30,32 @@
     <button type="submit" class="btn btn-primary">Search</button>
 </EditForm>*@
 <EditForm Model="@criteriaData" OnSubmit="HandleSubmit">
-<RadzenCard Style="width: 100%;">
-<div class="container">
-    <div class="row">
-        <div class="col-sm-3 col-md-6">
-                <RadzenText TextStyle=" TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">UserName Customer</RadzenText>
-                <RadzenTextBox @bind-Value="criteriaData.UserNameCustomer" Name="UserNameCustomer" Style="width:100%; display: block;" />
-        </div>
-        <div class="col-sm-3 col-md-6">
-                <RadzenText TextStyle=" TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">UserName Staff Rent</RadzenText>
-                <RadzenTextBox @bind-Value="criteriaData.UserNameStaffRent" Name="UserNameStaffRent" Style="width:100%; display: block;" />
-        </div>
-    </div>
-        <div class="row">
-            <div class="col-sm-3 col-md-6">
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">RentDate Date</RadzenText>
-                <RadzenDatePicker Style="100%" @bind-Value="criteriaData.RentDate" Name="RentDate" />
+    <RadzenCard Style="width: 500px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-3 col-md-6">
+                    <RadzenText TextStyle=" TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">UserName Customer</RadzenText>
+                    <RadzenTextBox @bind-Value="criteriaData.UserNameCustomer" Name="UserNameCustomer" Style="display: block;" />
+                </div>
+                <div class="col-sm-3 col-md-6">
+                    <RadzenText TextStyle=" TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">UserName Staff Rent</RadzenText>
+                    <RadzenTextBox @bind-Value="criteriaData.UserNameStaffRent" Name="UserNameStaffRent" Style="display: block;" />
+                </div>
             </div>
-            
-        </div>
-</div>
+            <div class="row">
+                <div class="col-sm-3 col-md-6">
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3" Class="d-flex mt-3 mb-0" Style="color: var(--rz-text-tertiary-color);">RentDate Date</RadzenText>
+                    <RadzenDatePicker Style="100%" @bind-Value="criteriaData.RentDate" Name="RentDate" />
+                </div>
 
-    <RadzenButton ButtonType="ButtonType.Submit" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Primary" Text="Search"  />
-</RadzenCard>
+            </div>
+        </div>
+
+        <div style="padding:10px;">
+            <RadzenButton ButtonType="ButtonType.Submit" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Primary" Text="Search" />
+        </div>
+
+    </RadzenCard>
 </EditForm>
 
 @*<table class="table">
@@ -94,9 +97,9 @@
 </table>*@
 
 @*<button class="btn btn-primary" @onclick="CreateNewTransaction">Create New</button>*@
-<div class="row">
+<div class="row" style="padding:20px;">
     <div class="col"><RadzenButton Text="Create New" Click="@(args=>CreateNewTransaction())" /></div>
-    
+
 </div>
 
 
@@ -104,7 +107,7 @@
                 AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 SelectionMode="DataGridSelectionMode.Single"
-                Data="@MoviesRentalTransactionService.MoviesRentalTransaction" TItem="DataGridTransactions" ColumnWidth="100%" LogicalFilterOperator="LogicalFilterOperator.Or" GridLines="@GridLines"
+                Data="@MoviesRentalTransactionService.MoviesRentalTransaction" TItem="DataGridTransactions" ColumnWidth="500px" LogicalFilterOperator="LogicalFilterOperator.Or" GridLines="@GridLines"
                 EditMode="DataGridEditMode.Single">
 
     <Columns>
@@ -112,15 +115,15 @@
 
         <RadzenDataGridColumn TItem="DataGridTransactions" Property="MovieName" Filterable="false" Title="Name" Width="150px" TextAlign="TextAlign.Left">
             @*<EditTemplate Context="trans">
-                <RadzenTextBox @bind-Value="trans.Movie.Name" Name="Name" Style="width:100%; display: block;" />
-                <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
+            <RadzenTextBox @bind-Value="trans.Movie.Name" Name="Name" Style="width:100%; display: block;" />
+            <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
             </EditTemplate>*@
         </RadzenDataGridColumn>
 
         <RadzenDataGridColumn TItem="DataGridTransactions" Property="MovieCost" Filterable="false" Title="Cost" Width="150px" TextAlign="TextAlign.Right">
-           @* <EditTemplate Context="trans">
-                <RadzenNumeric @bind-Value="trans.Movie.Cost" Name="Cost" Style="width:100%; display: block;" />
-                <RadzenRequiredValidator Text="Cost is required" Component="Cost" Popup="true" />
+            @* <EditTemplate Context="trans">
+            <RadzenNumeric @bind-Value="trans.Movie.Cost" Name="Cost" Style="width:100%; display: block;" />
+            <RadzenRequiredValidator Text="Cost is required" Component="Cost" Popup="true" />
             </EditTemplate>*@
         </RadzenDataGridColumn>
 
@@ -131,14 +134,14 @@
         <RadzenDataGridColumn TItem="DataGridTransactions" Property="StaffRentFirstName" Filterable="false" Title="Staff Rent" Width="150px" TextAlign="TextAlign.Left" />
         <RadzenDataGridColumn TItem="DataGridTransactions" Property="StaffReturnFirstName" Filterable="false" Title="Staff Return" Width="150px" TextAlign="TextAlign.Left" />
 
-        <RadzenDataGridColumn TItem="DataGridTransactions" Context="trans" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn TItem="DataGridTransactions" Context="trans" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="200px">
             <Template Context="trans">
                 <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditTransaction(trans))" @onclick:stopPropagation="true">
                 </RadzenButton>
-               @* <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => ShowInlineDialog(movie))" @onclick:stopPropagation="true">
-                </RadzenButton>*@
+                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => OpenConfirm(trans))" @onclick:stopPropagation="true">
+                </RadzenButton>
             </Template>
-            
+
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
@@ -187,7 +190,7 @@
     async Task EditTransaction(DataGridTransactions trans)
     {
         var res = await MoviesRentalTransactionService.OpenEditDialog(trans);
-        if(res != null)
+        if (res != null)
         {
             var authstate = await AuthStateProvider.GetAuthenticationStateAsync();
             var user = authstate.User;
@@ -195,6 +198,15 @@
             await MoviesRentalTransactionService.UpdateTransaction(res);
         }
         await MoviesRentalTransactionService.GetMoviesRentalTransactionByCriteria(criteriaData);
+    }
+
+    async Task OpenConfirm(DataGridTransactions data)
+    {
+        var result = await dialogService.OpenAsync<ConfirmDialog>("Confirm Delete");
+        if (result != null && result == true)
+        {
+            await DeleteTransaction(data.Id);
+        }
     }
 
 }
