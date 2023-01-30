@@ -26,13 +26,18 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+      - name: CHECK-OUT GIT REPOSITORY
+        uses: actions/checkout@v3
+      - name: Run docker-compose stack
+        run: docker-compose -f docker-compose.yml up -d
+          
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
         
       - uses: actions/checkout@v3
       - uses: isbang/compose-action@v1.4.1
         with:
-          compose-file: "./docker/docker-compose.yml"
+          compose-file: "/docker-compose.yml"
           down-flags: "--volumes"
       -
         name: Login to DockerHub
