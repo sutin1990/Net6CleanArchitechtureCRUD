@@ -26,15 +26,14 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Set up QEMU
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
         
-      - name: publish
-        uses: pennsignals/publish_docker-compose@v0.1.0
+      - uses: actions/checkout@v3
+      - uses: isbang/compose-action@v1.4.1
         with:
-          version: '0.2.6-rc.1'
-          docker_compose: 'docker-compose.yml'
+          compose-file: "./docker/docker-compose.yml"
+          down-flags: "--volumes"
       -
         name: Login to DockerHub
         uses: docker/login-action@v1 
