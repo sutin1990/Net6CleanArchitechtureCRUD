@@ -40,15 +40,8 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_CLEAN_BLAZOR_PASSWORD }}
       -
         name: Build and push Web API
-        id: docker_build_api
+        id: docker_build
         uses: docker/build-push-action@v2
         with:
           push: true
           tags: sutin1990docker/cleanmovieapi:tagname1
-      -
-        name: Build and push Web API
-        id: docker_build_ui
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: sutin1990docker/cleanmovieui:tagname1
