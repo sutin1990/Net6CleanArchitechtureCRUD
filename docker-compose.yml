@@ -17,10 +17,10 @@ services:
     image: ${DOCKER_REGISTRY-}cleanmovieapi
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=https://+:443;http://+:80
     ports:
       - "8084:80"
-      # - "8085:443"
+      - "8085:443"
     build:
       context: .
       dockerfile: CleanMovie.API/Dockerfile
