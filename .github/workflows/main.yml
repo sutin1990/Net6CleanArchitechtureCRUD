@@ -27,30 +27,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: CHECK-OUT GIT REPOSITORY
-        uses: actions/checkout@v3    
+        uses: actions/checkout@v2 
         
       - name: Start dependencies (docker-compose)
         run: |
                     docker-compose up -d  
           
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-        
-      - uses: actions/checkout@v3
-      - uses: isbang/compose-action@v1.4.1
-        with:
-          compose-file: "./docker/docker-compose.yml"
-          down-flags: "--volumes"
-      -
-        name: Login to DockerHub
-        uses: docker/login-action@v1 
-        with:
-          username: ${{ secrets.DOCKER_HUB_CLEAN_BLAZOR_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_CLEAN_BLAZOR_PASSWORD }}
-      -
-        name: Build and push Web API
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: sutin1990docker/cleanmovieapi:tagname1
+      - name: Test
+        run: docker run --network container:webapp-frontend appropriate/curl -s --retry 10 --retry-connrefused http://localhost:8084/
+     
+      
