@@ -41,9 +41,16 @@ jobs:
         
       -
         name: Build and push Web API
-        id: docker_build
         uses: docker/build-push-action@v3
         with:
           push: true
           file: ./CleanMovie.API/Dockerfile
           tags: sutin1990docker/cleanmovieapi:tagname1
+          
+      -
+        name: Build and push Web UI
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          file: ./CleanMovie.UI/Dockerfile
+          tags: sutin1990docker/cleanmovieui:tagname1
