@@ -1,8 +1,10 @@
 ﻿using CleanMovie.Application;
+using LogUtility;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,8 +33,9 @@ namespace CleanMovie.Infrastructure
             services.AddScoped<IUserLoginDtoService, UserLoginDtoService>();
             services.AddScoped<IMovieRentalTransactionRepository, MovieRentalTransactionRepository>();
             services.AddScoped<IMovieRentalTransactionService, MovieRentalTransactionService>();
+            services.AddScoped<ILoggerService, LoggerService>();
             services.AddMediatR(typeof(MovieService).GetTypeInfo().Assembly);
-
+            
             return services;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using CleanMovie.Application.Qureies;
 using CleanMovie.Domain.DBModels;
+using LogUtility;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,10 +18,12 @@ namespace CleanMovie.API.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IConfiguration _configurationManager;
-        public AuthController(IMediator mediator, IConfiguration configurationManager)
+        private readonly ILoggerService _log;
+        public AuthController(IMediator mediator, IConfiguration configurationManager, ILoggerService log)
         {
             _mediator = mediator;
             _configurationManager = configurationManager;
+            _log = log;
         }
 
         [Route("login")]
@@ -30,6 +33,7 @@ namespace CleanMovie.API.Controllers
         {
             try
             {
+                _log.Info("start authentication..");
                 if (string.IsNullOrEmpty(request.UserName) || string.IsNullOrEmpty(request.Password))
                 {
                     return BadRequest("Username and/or Password not specified");
@@ -63,12 +67,14 @@ namespace CleanMovie.API.Controllers
                         );
 
                 var res = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+                _log.Info($"Token: {res}");
 
                 //string token = "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiVG9ueSBTdGFyayIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6Iklyb24gTWFuIiwiZXhwIjozMTY4NTQwMDAwfQ.IbVQa1lNYYOzwso69xYfsMOHnQfO3VLvVqV2SOXS7sTtyyZ8DEf5jmmwz2FGLJJvZnQKZuieHnmHkg7CGkDbvA";
                 return Ok(new UserLoginDtoResponse { Token = res });
             }
             catch(Exception err)
             {
+                _log.Error(err.Message);
                 return BadRequest(new {Message = err.Message,StackTrace = err.StackTrace });
                 //("An error occurred in generating the token");
             }
