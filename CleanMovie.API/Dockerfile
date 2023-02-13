@@ -12,6 +12,7 @@ COPY ["CleanMovie.API/CleanMovie.API.csproj", "CleanMovie.API/"]
 COPY ["CleanMovie.Application/CleanMovie.Application.csproj", "CleanMovie.Application/"]
 COPY ["CleanMovie.Domain/CleanMovie.Domain.csproj", "CleanMovie.Domain/"]
 COPY ["CleanMovie.Infrastructure/CleanMovie.Infrastructure.csproj", "CleanMovie.Infrastructure/"]
+COPY ["CleanMovie.LogUtility/CleanMovie.LogUtility.csproj","CleanMovie.LogUtility/"]
 RUN dotnet restore "CleanMovie.API/CleanMovie.API.csproj"
 COPY . .
 WORKDIR "/src/CleanMovie.API"
@@ -22,6 +23,6 @@ RUN dotnet publish "CleanMovie.API.csproj" -c Release -o /app/publish /p:UseAppH
 
 FROM base AS final
 WORKDIR /app
-# COPY --from=publish /root/.dotnet/corefx/cryptography/x509stores/my/* /root/.dotnet/corefx/cryptography/x509stores/my/
+#COPY --from=publish /root/.dotnet/corefx/cryptography/x509stores/my/* /root/.dotnet/corefx/cryptography/x509stores/my/
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "CleanMovie.API.dll"]

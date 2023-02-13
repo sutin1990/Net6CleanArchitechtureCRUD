@@ -24,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\LogUtility\LogUtility.csproj" />
     <ProjectReference Include="..\CleanMovie.Application\CleanMovie.Application.csproj" />
+    <ProjectReference Include="..\CleanMovie.LogUtility\CleanMovie.LogUtility.csproj" />
   </ItemGroup>
 
 </Project>
