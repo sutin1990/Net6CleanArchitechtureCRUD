@@ -19,8 +19,7 @@ namespace CleanMovie.UI.Services
         }
 
         public List<Movie> Movies { get; set; } = new List<Movie>();
-        public async Task GetAllMovies()
-        
+        public async Task GetAllMovies()        
         {
             var result = await _http.GetFromJsonAsync<List<Movie>>("api/Movies/GetAllMovie");
             if (result != null)
