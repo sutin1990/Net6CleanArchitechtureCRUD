@@ -16,8 +16,7 @@ namespace CleanMovie.Infrastructure
 {
     public static class DependecyInjection
     { 
-        public static IServiceCollection ImplementPersistence(this
-            IServiceCollection services,IConfiguration configuration)
+        public static IServiceCollection ImplementPersistence(this IServiceCollection services,IConfiguration configuration)
         {
             //Add DbContext 
             services.AddDbContext<MovieDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),

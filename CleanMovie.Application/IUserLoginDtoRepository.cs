@@ -9,7 +9,7 @@ namespace CleanMovie.Application
 {
     public interface IUserLoginDtoRepository
     {
-        public Task<UserLoginDto> GetUserLogin(UserLoginDto userLoginDto);
+        public Task<UserLoginDto?> GetUserLogin(UserLoginDto userLoginDto);
         public Task<List<UserLoginDto>> GetUserLoginById(int? id);
     }
 }

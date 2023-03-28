@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CleanMovie.Domain\CleanMovie.Domain.csproj" />
+    <ProjectReference Include="..\CleanMovie.LogUtility\CleanMovie.LogUtility.csproj" />
   </ItemGroup>
 
   <ItemGroup>
