@@ -33,6 +33,7 @@ namespace CleanMovie.API.Controllers
         {
             try
             {
+            
                 _log.Info("start authentication..");
                 if (string.IsNullOrEmpty(request.UserName) || string.IsNullOrEmpty(request.Password))
                 {
