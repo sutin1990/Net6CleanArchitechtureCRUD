@@ -42,14 +42,14 @@
 
 <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Add New Movie" Click="@InsertRow" Disabled=@(movieToInsert != null || movieToUpdate != null) />
 
-<RadzenDataGrid @ref="movieGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="true" AllowColumnPicking="true" AllowGrouping="true"
+<RadzenDataGrid @ref="movieGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="true" FilterMode="FilterMode.Advanced"  AllowColumnPicking="true" AllowGrouping="true"
                 AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 SelectionMode="DataGridSelectionMode.Single"
 
                 Data="@MovieService.Movies" TItem="Movie" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" GridLines="@GridLines"
                 EditMode="DataGridEditMode.Single"
-                RowCreate="@OnCreateRow" RowUpdate="@OnUpdateRow">
+                RowCreate="@OnCreateRow" RowUpdate="@OnUpdateRow" >
 
     <Columns>
         <RadzenDataGridColumn TItem="Movie" Property="Id" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
@@ -175,7 +175,7 @@
         {
             movieToInsert = null;
         }
-
+        movieToUpdate = null;
         movieGrid?.CancelEditRow(movie);
 
     }

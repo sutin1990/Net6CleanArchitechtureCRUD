@@ -106,6 +106,7 @@
 
 <RadzenDataGrid @ref="transGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="true" AllowColumnPicking="true" AllowGrouping="true"
                 AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                FilterMode="FilterMode.Advanced"
                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 SelectionMode="DataGridSelectionMode.Single"
                 Data="@MoviesRentalTransactionService.MoviesRentalTransaction" TItem="DataGridTransactions" ColumnWidth="500px" LogicalFilterOperator="LogicalFilterOperator.Or" GridLines="@GridLines"
